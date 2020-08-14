@@ -65,14 +65,7 @@ class Player:
         self.current_room = starting_room
 
         
-    def travel(self, direction, show_rooms = False):
-        next_room = self.current_room.get_room_in_direction(direction)
-        if next_room is not None:
-            self.current_room = next_room
-            if (show_rooms):
-                next_room.print_room_description(self)
-        else:
-            print("You cannot move in that direction.")
+  
 '''
 player = Player(world.starting_room)
 
@@ -152,16 +145,54 @@ while len(visited) < len(world.rooms):
     path = []
 
     for exit_room in exits:
-        # check to make sure room move is valid 
+        # check to make sure room move is valid
         if exit_room is not None:
-            # there is an exit_room , the room is not visited
+            # an exit_room is found , the room is not visited
             if player.current_room.get_room_in_direction(exit_room) not in visited:
                 # append the exit_room to the path
                 path.append(exit_room)
     # the room now is visited , loop over another one.
     visited.add(player.current_room)
 
+    
+    # if check to make sure the path is over 0
+    if len(path) > 0:
+        '''
+        make sure there are ways to travel
+        use a random integer to randomly choose direction, 
+        moves test different,
+        stack: -1 to get the last in the list
+         '''
+        move = random.randint(0, len(path) - 1)
+        # insert the element to the top of the stack
+        stack.push(path[move])
+        '''
+        def travel(self, direction, show_rooms = False):
+            next_room = self.current_room.get_room_in_direction(direction)
+            if next_room is not None:
+                self.current_room = next_room
+                if (show_rooms):
+                    next_room.print_room_description(self)
+            else:
+                print("You cannot move in that direction.")
+        '''
+        # player  moves along the path
+        player.travel(path[move])
+        traversal_path.append(path[move])
 
+    else:
+        '''
+        check of the there a dead end(no direction)
+        then remove the item form the stack
+        go opposite or whatever direction is available 
+        push the direction to the traversal_path
+        '''
+        # implement the back tracking if the room leads to a dead end
+        deadEnd = stack.pop()
+        # pop and remove the top item from the stack
+        player.travel(directions(deadEnd))
+        # will travel in opposite direction, as per directions
+        traversal_path.append(directions(deadEnd))
 
 
 # **********************************************************
