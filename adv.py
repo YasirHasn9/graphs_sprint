@@ -6,6 +6,14 @@ import random
 from ast import literal_eval
 
 # Load world
+'''
+class World:
+    def __init__(self):
+        self.starting_room = None
+        self.rooms = {}
+        self.room_grid = []
+        self.grid_size = 0
+'''
 world = World()
 
 
@@ -18,11 +26,54 @@ map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph = literal_eval(open(map_file, "r").read())
+'''
+world class
+  def load_graph(self, room_graph):
+        num_rooms = len(room_graph)
+        rooms = [None] * num_rooms
+        grid_size = 1
+        for i in range(0, num_rooms):
+            x = room_graph[i][0][0]
+            grid_size = max(grid_size, room_graph[i][0][0], room_graph[i][0][1])
+            self.rooms[i] = Room(f"Room {i}", f"({room_graph[i][0][0]},{room_graph[i][0][1]})",i, room_graph[i][0][0], room_graph[i][0][1])
+        self.room_grid = []
+        grid_size += 1
+        self.grid_size = grid_size
+        for i in range(0, grid_size):
+            self.room_grid.append([None] * grid_size)
+        for room_id in room_graph:
+            room = self.rooms[room_id]
+            self.room_grid[room.x][room.y] = room
+            if 'n' in room_graph[room_id][1]:
+                self.rooms[room_id].connect_rooms('n', self.rooms[room_graph[room_id][1]['n']])
+            if 's' in room_graph[room_id][1]:
+                self.rooms[room_id].connect_rooms('s', self.rooms[room_graph[room_id][1]['s']])
+            if 'e' in room_graph[room_id][1]:
+                self.rooms[room_id].connect_rooms('e', self.rooms[room_graph[room_id][1]['e']])
+            if 'w' in room_graph[room_id][1]:
+                self.rooms[room_id].connect_rooms('w', self.rooms[room_graph[room_id][1]['w']])
+        self.starting_room = self.rooms[0]
+'''
 world.load_graph(room_graph)
 
 # Print an ASCII map
 world.print_rooms()
+'''
+this is form the player file 
+class Player:
+    def __init__(self, starting_room):
+        self.current_room = starting_room
 
+        
+    def travel(self, direction, show_rooms = False):
+        next_room = self.current_room.get_room_in_direction(direction)
+        if next_room is not None:
+            self.current_room = next_room
+            if (show_rooms):
+                next_room.print_room_description(self)
+        else:
+            print("You cannot move in that direction.")
+'''
 player = Player(world.starting_room)
 
 # Fill this out with directions to walk
@@ -34,13 +85,16 @@ use stack or queue to add room
 sets to make sure we visited the room
 function for direction ["n" , "s" "e" , "w"]
 
-loop over the rooms while there are rooms more the one in the visited 
+loop over the rooms 
+while there are rooms more the one in the visited 
        get the exits for the player 
-       each exit in the palyer room are exit , so find the room
+       each exit_room in the palyer room contains an exit_room for other room
 
 
 
 '''
+
+
 class Stack():
     def __init__(self):
         self.stack = []
@@ -57,12 +111,14 @@ class Stack():
     def size(self):
         return len(self.stack)
 
+
 stack = Stack()
-# set to keep track of the visited rooms
+
+# keep track of the visited rooms
 visited = set()
 
 
-# set up the 4 directions for the player to move
+# get the direction for each room , an exit_room!.
 def directions(direction):
     if direction == "n":
         return "s"
@@ -72,6 +128,38 @@ def directions(direction):
         return "w"
     elif direction == "w":
         return "e"
+
+
+# since we have less visited rooms
+while len(visited) < len(world.rooms):
+
+    # each room has several exits
+    '''
+    from the room file 
+      def get_exits(self):
+        exits = []
+        if self.n_to is not None:
+            exits.append("n")
+        if self.s_to is not None:
+            exits.append("s")
+        if self.w_to is not None:
+            exits.append("w")
+        if self.e_to is not None:
+            exits.append("e")
+        return exits
+    '''
+    exits = player.current_room.get_exits()
+    path = []
+
+    for exit_room in exits:
+        # check to make sure room move is valid 
+        if exit_room is not None:
+            # there is an exit_room , the room is not visited
+            if player.current_room.get_room_in_direction(exit_room) not in visited:
+                # append the exit_room to the path
+                path.append(exit_room)
+    # the room now is visited , loop over another one.
+    visited.add(player.current_room)
 
 
 
