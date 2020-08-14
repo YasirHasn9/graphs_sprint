@@ -58,8 +58,11 @@ class Stack():
         return len(self.stack)
 
 stack = Stack()
+# set to keep track of the visited rooms
 visited = set()
 
+
+# set up the 4 directions for the player to move
 def directions(direction):
     if direction == "n":
         return "s"
